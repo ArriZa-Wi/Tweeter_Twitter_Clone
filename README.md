@@ -2,6 +2,9 @@
 
 A full-featured Twitter clone built with Django. Users can sign up, create posts ("Twits"), like and comment on others' posts, and manage their profiles -- all styled with Bootstrap 5.
 
+> [!NOTE]
+> This repo only has a single commit because the project was originally developed as a final project for a class, hosted on a private GitHub organization. This is a clean copy brought over to my personal GitHub.
+
 ## Overview
 
 Tweeter is a social media web app inspired by Twitter. It's built entirely with Django class-based views and follows a two-app architecture:
