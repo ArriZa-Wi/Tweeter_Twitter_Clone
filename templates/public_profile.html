@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<h1>Public Profile</h1>
+
+<div class="mb-4">
+  <h3>{{ profile_user.get_full_name }}</h3>
+  <p><i class="bi bi-envelope"></i> {{ profile_user.email }} |
+     <i class="bi bi-calendar"></i> Joined {{ profile_user.date_joined|date:"F d, Y, g:i a" }}</p>
+  <p><i class="bi bi-twitter"></i> Twits: {{ twits.count }}</p>
+</div>
+
+{% for twit in twits %}
+  <div class="card mb-4">
+    <div class="card-header">
+      {{ twit.created|timesince }} ago
+    </div>
+    <div class="card-body">
+        <p>{{ twit.body }}</p>
+        
+        {% if twit.image_url %}
+          <img src="{{ twit.image_url }}" class="img-fluid rounded mt-2" alt="Twit image">
+        {% endif %}
+      
+        <div class="mt-3">
+          <button class="btn btn-sm btn-outline-primary" disabled>
+            <i class="bi bi-hand-thumbs-up{% if user in twit.likes.all %}-fill{% endif %}"></i>
+            {{ twit.likes.count }} Like
+          </button>
+        </div>
+      
+        <hr>
+        <h6>Comments</h6>
+        {% if twit.comments.exists %}
+          {% for comment in twit.comments.all %}
+            <div class="mb-2">
+              <strong>@{{ comment.author.username }}</strong> —
+              <small class="text-muted">{{ comment.created|date:"M d, Y H:i" }}</small>
+              <p class="mb-1">{{ comment.body }}</p>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-muted">No comments yet.</p>
+        {% endif %}
+      </div>
+  </div>
+{% endfor %}
+
+{% endblock %}

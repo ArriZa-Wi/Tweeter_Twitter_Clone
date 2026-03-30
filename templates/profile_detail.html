@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+
+{% block title %}Your Profile{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Your Profile</h2>
+    <ul class="list-group mb-3">
+      <li class="list-group-item"><strong>Username:</strong> {{ user.username }}</li>
+      <li class="list-group-item"><strong>First Name:</strong> {{ user.first_name }}</li>
+      <li class="list-group-item"><strong>Last Name:</strong> {{ user.last_name }}</li>
+      <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+      <li class="list-group-item"><strong>Date of Birth:</strong> {{ user.date_of_birth }}</li>
+    </ul>
+    <a href="{% url 'profile_update' %}" class="btn btn-primary">Edit Profile</a>
+  </div>
+{% endblock %}

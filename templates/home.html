@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Home - Tweeter{% endblock title %}
+
+{% block header %}
+<div class="text-center">
+  <h1>Welcome to Tweeter!</h1>
+</div>
+{% endblock header %}
+
+{% block content %}
+<div class="d-flex justify-content-center mt-4">
+  <div class="card text-center shadow" style="max-width: 500px; width: 100%;">
+    <div class="card-body">
+      {% if user.is_authenticated %}
+        <h5 class="card-title">Hello, {{ user.username }}!</h5>
+        <p class="card-text">Start sharing your thoughts with the world.</p>
+        <div class="d-flex justify-content-center gap-2">
+          <a href="{% url 'twit_create' %}" class="btn btn-primary">Create a Twit</a>
+          <a href="{% url 'twit_list' %}" class="btn btn-secondary">View Twits</a>
+        </div>
+      {% else %}
+        <p class="card-text lead">Join us and share your thoughts with the world.</p>
+        <a href="{% url 'login' %}" class="btn btn-outline-primary mb-2 w-100">Login</a>
+        <a href="{% url 'signup' %}" class="btn btn-success w-100">Sign Up</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock content %}
