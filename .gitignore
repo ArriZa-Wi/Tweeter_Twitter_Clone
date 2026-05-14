@@ -141,3 +141,8 @@ cython_debug/
 staticfiles/
 static_files/
 
+# Editor / tool state
+.claude/
+.vscode/
+.idea/
+

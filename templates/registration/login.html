@@ -1,17 +1,21 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
-
-{% block title %}Login{% endblock title %}
+{% block title %}login{% endblock title %}
 
 {% block content %}
-    <h2>Login</h2>
-        <form method="POST">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <button class="btn btn-success ml-2" type="submit">Log In</button>
-        </form>
-    <p>
-        <a href="{% url 'password_reset' %}">Forgot your password?</a>
-    </p>
+<section class="auth-card">
+  <h2 class="auth-title">login</h2>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="form-actions">
+      <button class="btn btn-primary btn-block" type="submit">authenticate</button>
+    </div>
+  </form>
+  <p class="auth-footer">
+    <a href="{% url 'password_reset' %}">forgot password?</a> ·
+    <a href="{% url 'signup' %}">new here? sign up</a>
+  </p>
+</section>
 {% endblock content %}

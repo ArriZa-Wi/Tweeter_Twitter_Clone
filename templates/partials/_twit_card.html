@@ -1,0 +1,50 @@
+{% load static %}
+<article class="twit-card" id="twit-{{ twit.id }}">
+  <header class="twit-header">
+    <a class="twit-author" href="{% url 'public_profile' twit.author.pk %}">{{ twit.author.username }}</a>
+    <span class="twit-meta" title="{{ twit.created|date:'Y-m-d H:i' }}">{{ twit.created|timesince }} ago</span>
+  </header>
+
+  <div class="twit-body">
+    <div class="twit-content" data-markdown data-source="{{ twit.body }}">{{ twit.body }}</div>
+    {% if twit.image_url %}
+      <img class="twit-image" src="{{ twit.image_url }}" alt="twit image" loading="lazy">
+    {% endif %}
+
+    <div class="twit-actions">
+      {% with user_likes=twit.likes.all %}
+        <button
+          class="like-btn{% if user in user_likes %} is-liked{% endif %}"
+          data-twit-id="{{ twit.id }}"
+          hx-get="{{ twit.get_like_url }}?twit_action={% if user in user_likes %}unlike{% else %}like{% endif %}"
+          hx-swap="none"
+        >
+          <span class="heart">{% if user in user_likes %}♥{% else %}♡{% endif %}</span>
+          <span class="like-count" data-prev="{{ user_likes|length }}">{{ user_likes|length }}</span>
+        </button>
+      {% endwith %}
+
+      <a href="{% url 'twit_detail' twit.pk %}" class="btn btn-ghost btn-sm">
+        <span>{{ twit.comments.count }} replies</span>
+      </a>
+    </div>
+  </div>
+
+  <footer class="twit-footer">
+    <span class="twit-meta">id={{ twit.id }}</span>
+    <div class="owner-actions">
+      {% if twit.author == user %}
+        <a href="{% url 'twit_update' twit.pk %}" class="btn btn-ghost btn-sm">edit</a>
+        <button
+          class="btn btn-danger btn-sm"
+          hx-delete="{% url 'twit_delete' twit.pk %}"
+          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+          hx-confirm="Delete this twit? This cannot be undone."
+          hx-target="#twit-{{ twit.id }}"
+          hx-swap="outerHTML swap:300ms"
+          data-removes-card="1"
+        >delete</button>
+      {% endif %}
+    </div>
+  </footer>
+</article>

@@ -1,0 +1,7 @@
+<div class="comment" id="comment-{{ comment.id }}">
+  <div class="comment-head">
+    <span class="comment-author">{{ comment.author.username }}</span>
+    <span class="comment-meta" title="{{ comment.created|date:'Y-m-d H:i' }}">{{ comment.created|timesince }} ago</span>
+  </div>
+  <p class="comment-body">{{ comment.body }}</p>
+</div>

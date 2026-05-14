@@ -1,31 +1,24 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-
-{% block title %}Home - Tweeter{% endblock title %}
-
-{% block header %}
-<div class="text-center">
-  <h1>Welcome to Tweeter!</h1>
-</div>
-{% endblock header %}
+{% block title %}home // tweeter{% endblock title %}
 
 {% block content %}
-<div class="d-flex justify-content-center mt-4">
-  <div class="card text-center shadow" style="max-width: 500px; width: 100%;">
-    <div class="card-body">
-      {% if user.is_authenticated %}
-        <h5 class="card-title">Hello, {{ user.username }}!</h5>
-        <p class="card-text">Start sharing your thoughts with the world.</p>
-        <div class="d-flex justify-content-center gap-2">
-          <a href="{% url 'twit_create' %}" class="btn btn-primary">Create a Twit</a>
-          <a href="{% url 'twit_list' %}" class="btn btn-secondary">View Twits</a>
-        </div>
-      {% else %}
-        <p class="card-text lead">Join us and share your thoughts with the world.</p>
-        <a href="{% url 'login' %}" class="btn btn-outline-primary mb-2 w-100">Login</a>
-        <a href="{% url 'signup' %}" class="btn btn-success w-100">Sign Up</a>
-      {% endif %}
+<section class="hero">
+  <h1 class="hero-title">tweeter</h1>
+  <p class="hero-subtitle">// a microblog for people who live in the terminal</p>
+
+  {% if user.is_authenticated %}
+    <p class="hero-subtitle" style="margin-top:18px;">welcome back, <span style="color: var(--accent);">{{ user.username }}</span></p>
+    <div class="hero-actions">
+      <a href="{% url 'twit_create' %}" class="btn btn-primary">+ new twit</a>
+      <a href="{% url 'twit_list' %}" class="btn btn-ghost">~/feed</a>
     </div>
-  </div>
-</div>
+  {% else %}
+    <p class="hero-subtitle" style="margin-top:18px;">log in to start posting</p>
+    <div class="hero-actions">
+      <a href="{% url 'login' %}" class="btn btn-ghost">login</a>
+      <a href="{% url 'signup' %}" class="btn btn-primary">sign up</a>
+    </div>
+  {% endif %}
+</section>
 {% endblock content %}

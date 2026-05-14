@@ -1,54 +1,46 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
 
-
-{% block title %}Twit Detail{% endblock title %}
+{% block title %}twit #{{ twit.id }}{% endblock title %}
 
 {% block content %}
-  <div class="card shadow-sm mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <span class="fw-bold">@{{ twit.author.username }}</span>
-      <small class="text-muted">{{ twit.created|date:"M d, Y H:i" }}</small>
-    </div>
+<header class="page-header">
+  <span class="prompt-symbol">$</span> cat twit_{{ twit.id }}.md
+  <a href="{% url 'twit_list' %}" style="float: right;">← back to feed</a>
+</header>
 
-    <div class="card-body">
-      <p>{{ twit.body }}</p>
-      {% if twit.image_url %}
-        <img src="{{ twit.image_url }}" class="img-fluid rounded mt-2" alt="Twit image" style="max-width: 300px;">
-      {% endif %}
+{% include "partials/_twit_card.html" with twit=twit %}
 
-      <h5>Comments</h5>
-      {% if twit.comments.exists %}
-        {% for comment in twit.comments.all %}
-          <div class="border-bottom pb-2 mb-3">
-            <div class="d-flex justify-content-between">
-              <strong>@{{ comment.author.username }}</strong>
-              <small class="text-muted">{{ comment.created|date:"M d, Y H:i" }}</small>
-            </div>
-            <p class="mb-0">{{ comment.body }}</p>
-          </div>
-        {% endfor %}
-      {% else %}
-        <p class="text-muted">No comments yet.</p>
-      {% endif %}
-
-      <h5>Add a comment</h5>
-      <form method="POST">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <button type="submit" class="btn btn-success">Save</button>
-      </form>
-    </div>
-
-    <div class="card-footer d-flex justify-content-between align-items-center">
-      <div>
-        {% if twit.author == user %}
-          <a href="{% url 'twit_update' twit.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-          <a href="{% url 'twit_delete' twit.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
-        {% endif %}
-      </div>
-      <a href="{% url 'twit_list' %}" class="btn btn-sm btn-primary">Back to All Twits</a>
-    </div>
+<section class="form-card">
+  <h2 class="form-card-title">replies</h2>
+  <div id="comments-list">
+    {% if twit.comments.exists %}
+      {% for comment in twit.comments.all %}
+        {% include "partials/_comment.html" with comment=comment %}
+      {% endfor %}
+    {% else %}
+      <p class="no-comments" id="no-comments-msg">no replies yet</p>
+    {% endif %}
   </div>
-{% endblock content %}
 
+  <hr>
+
+  <form
+    method="POST"
+    action=""
+    hx-post=""
+    hx-target="#comments-list"
+    hx-swap="beforeend"
+    data-reset-on-success
+    hx-on::after-request="document.getElementById('no-comments-msg')?.remove();"
+  >
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="id_body">reply <span style="color: var(--text-2);">(140 chars max)</span></label>
+      <textarea id="id_body" name="body" rows="2" maxlength="140" required placeholder="reply here..."></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">post reply</button>
+    </div>
+  </form>
+</section>
+{% endblock content %}

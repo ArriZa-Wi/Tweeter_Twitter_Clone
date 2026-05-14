@@ -1,17 +1,22 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
-
-{% block title %}Change Your Profile{% endblock %}
+{% block title %}edit profile{% endblock title %}
 
 {% block content %}
-  <div class="container mt-4">
-    <h2>Change Your Profile</h2>
-    <form method="post">
-      {% csrf_token %}
-      {{ form|crispy }}
-      <button class="btn btn-success" type="submit">Update</button>
-      <a class="btn btn-outline-primary float-end" href="{% url 'password_change' %}">Change Password</a>
-    </form>
-  </div>
-{% endblock %}
+<header class="page-header">
+  <span class="prompt-symbol">$</span> $EDITOR ~/.tweeterc
+</header>
+
+<section class="form-card">
+  <h2 class="form-card-title">edit profile</h2>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">save</button>
+      <a class="btn btn-ghost" href="{% url 'profile_detail' %}">cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock content %}

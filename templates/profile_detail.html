@@ -1,18 +1,24 @@
 {% extends "base.html" %}
 
-
-{% block title %}Your Profile{% endblock %}
+{% block title %}~/me{% endblock title %}
 
 {% block content %}
-  <div class="container mt-4">
-    <h2>Your Profile</h2>
-    <ul class="list-group mb-3">
-      <li class="list-group-item"><strong>Username:</strong> {{ user.username }}</li>
-      <li class="list-group-item"><strong>First Name:</strong> {{ user.first_name }}</li>
-      <li class="list-group-item"><strong>Last Name:</strong> {{ user.last_name }}</li>
-      <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
-      <li class="list-group-item"><strong>Date of Birth:</strong> {{ user.date_of_birth }}</li>
-    </ul>
-    <a href="{% url 'profile_update' %}" class="btn btn-primary">Edit Profile</a>
+<header class="page-header">
+  <span class="prompt-symbol">$</span> whoami --verbose
+</header>
+
+<section class="profile-sheet">
+  <dl class="profile-grid">
+    <dt>username</dt><dd>{{ user.username }}</dd>
+    <dt>first_name</dt><dd>{{ user.first_name|default:"<unset>" }}</dd>
+    <dt>last_name</dt><dd>{{ user.last_name|default:"<unset>" }}</dd>
+    <dt>email</dt><dd>{{ user.email|default:"<unset>" }}</dd>
+    <dt>date_of_birth</dt><dd>{{ user.date_of_birth|default:"<unset>" }}</dd>
+    <dt>joined</dt><dd>{{ user.date_joined|date:"Y-m-d" }}</dd>
+  </dl>
+  <div class="form-actions" style="margin-top: 20px;">
+    <a href="{% url 'profile_update' %}" class="btn btn-primary">edit profile</a>
+    <a href="{% url 'password_change' %}" class="btn btn-ghost">change password</a>
   </div>
-{% endblock %}
+</section>
+{% endblock content %}

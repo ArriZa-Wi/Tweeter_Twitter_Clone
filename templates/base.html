@@ -1,72 +1,84 @@
 {% load static %}
-
-
+{% load django_htmx %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <title>{% block title %}Tweeter App{% endblock title %}</title>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg bg-primary">
-      <div class="container-fluid">
-        <a class="navbar-brand text-white" href="{% url 'home' %}">Tweeter</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav ms-auto">
-            {% if user.is_authenticated %}
-            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 pe-5">
-              <li><a href="{% url 'twit_create' %}" class="btn btn-outline-light me-2">+ New Twit</a></li>
-              <li><a href="{% url 'profile_detail' %}" class="btn btn-outline-light">Profile</a></li>
-            </ul>
-            <div class="dropdown text-end pe-5">
-              <a 
-                  href="#" 
-                  class="d-block link-light text-decoration-none dropdown-toggle"
-                  id="dropdownUser1" 
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-              >
-                  Hi, {{ user.username }}!
-              </a>
-              <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-                <li><a class="dropdown-item" href="{% url 'password_change' %}">Change password</a></li>
-                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-              </ul>
-            </div>
-          {% else %}
-            <div class="text-end">
-              <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Login</a>
-              <a href="{% url 'signup' %}" class="btn btn-success">Sign Up</a>
-            </div>
-          {% endif %}          
-          </div>
-        </div>
-      </div>
-    </nav>
-    
-    <div class="container">
-      <figure class="text">
-        <blockquote class="blockquote">
-          <div class="mt-3 my-3 py-2 border-bottom border-2">
-            {% block header %}
-            {% endblock header %}
-          </div>
-        </blockquote>
-      </figure>
-      {% block content %}
-      {% endblock content %}
-    </div>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Tweeter{% endblock title %}</title>
 
-    <!-- jQuery JS Bundle -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <!-- Custom JS -->
-    <script src="{% static 'js/base.js' %}"></script>
-  </body>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+</head>
+<body hx-boost="true" hx-ext="head-support"
+      x-data="{ menuOpen: false, crt: localStorage.getItem('crt') === '1' }"
+      x-init="$watch('crt', v => { document.body.classList.toggle('crt', v); localStorage.setItem('crt', v ? '1' : '0'); }); document.body.classList.toggle('crt', crt);">
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="{% url 'home' %}">&gt; tweeter</a>
+
+      <ul class="nav-links">
+        {% if user.is_authenticated %}
+          <li><a href="{% url 'twit_list' %}">~/feed</a></li>
+          <li><a href="{% url 'twit_create' %}">+new</a></li>
+          <li><a href="{% url 'profile_detail' %}">~/me</a></li>
+        {% endif %}
+      </ul>
+
+      <div>
+        {% if user.is_authenticated %}
+          <div class="nav-user" @click.outside="menuOpen = false">
+            <span class="nav-user-trigger" @click="menuOpen = !menuOpen">
+              <span class="username-text">{{ user.username }}@tweeter</span>
+              <span class="caret">▼</span>
+            </span>
+            <ul class="nav-user-menu" x-show="menuOpen" x-transition style="display: none;">
+              <li><a href="#" @click.prevent="crt = !crt; menuOpen = false"><span x-text="crt ? '[x] crt mode' : '[ ] crt mode'"></span></a></li>
+              <li><a href="{% url 'profile_update' %}">edit profile</a></li>
+              <li><a href="{% url 'password_change' %}">change password</a></li>
+              <li><a href="{% url 'logout' %}">logout</a></li>
+            </ul>
+          </div>
+        {% else %}
+          <span style="display: inline-flex; gap: 8px;">
+            <a href="{% url 'login' %}" class="btn btn-ghost btn-sm">login</a>
+            <a href="{% url 'signup' %}" class="btn btn-primary btn-sm">sign up</a>
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <main class="app-container" id="main">
+    {% block header %}{% endblock header %}
+    {% block content %}{% endblock content %}
+  </main>
+
+  <!-- Logout form for CSRF-safe POST logout (Django 4.2 still allows GET; kept for forward-compat) -->
+
+  <!-- ===== JS ===== -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.3/dist/htmx.min.js"></script>
+  <script src="https://unpkg.com/htmx-ext-head-support@2.0.2/head-support.js"></script>
+  {% django_htmx_script %}
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@13/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/countup.js@2.8.0/dist/countUp.umd.js"></script>
+
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
 </html>

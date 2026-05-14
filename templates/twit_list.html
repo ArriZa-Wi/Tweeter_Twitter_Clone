@@ -1,63 +1,55 @@
 {% extends "base.html" %}
 
-
-{% block title %}All Twits{% endblock title %}
+{% block title %}~/feed{% endblock title %}
 
 {% block content %}
-  {% for twit in twit_list %}
-    <div class="card shadow-sm mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <a href="{% url 'public_profile' twit.author.pk %}" class="fw-bold">@{{ twit.author.username }}</a>
-        <small class="text-muted">{{ twit.created|date:"M d, Y H:i" }}</small>
-      </div>
+<header class="page-header">
+  <span class="prompt-symbol">$</span> cat ~/feed.log <span style="color: var(--text-2);">// {{ twit_list|length }} entries</span>
+</header>
 
-      <div class="card-body">
-        <p class="card-text">{{ twit.body }}</p>
-        {% if twit.image_url %}
-          <img src="{{ twit.image_url }}" class="img-fluid rounded mt-2" alt="Twit image" style="max-width: 300px; height: auto;">
-        {% endif %}
-
-        <hr class="my-3">
-        <h6>Comments</h6>
-        {% if twit.comments.exists %}
-          {% for comment in twit.comments.all %}
-            <div class="border-bottom pb-2 mb-3">
-              <div class="d-flex justify-content-between">
-                <strong>@{{ comment.author.username }}</strong>
-                <small class="text-muted">{{ comment.created|date:"M d, Y H:i" }}</small>
-              </div>
-              <p class="mb-0">{{ comment.body }}</p>
-            </div>
-          {% endfor %}
-        {% else %}
-          <p class="text-muted">No comments yet.</p>
-        {% endif %}
-
-        <div class="mt-3">
-          {% with user_likes=twit.likes.all %}
-            <button
-              data-id="{{ twit.id }}"
-              data-action="{% if user in user_likes %}un{% endif %}like"
-              data-like-url="{{ twit.get_like_url }}"
-              class="like_button btn btn-{% if user not in user_likes %}outline-{% endif %}primary"
-            >
-              <i class="like_icon bi-hand-thumbs-up{% if user in user_likes %}-fill{% endif %}"></i>
-              <span class="like_count">{{ user_likes|length }}</span>
-              Likes
-            </button>
-          {% endwith %}
-        </div>
-      </div>
-
-      <div class="card-footer d-flex justify-content-between align-items-center">
-        <div class="text-muted">
-          {% if twit.author == user %}
-            <a href="{% url 'twit_update' twit.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a> |
-            <a href="{% url 'twit_delete' twit.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
-          {% endif %}
-        </div>
-        <a href="{% url 'twit_detail' twit.pk %}" class="btn btn-sm btn-outline-primary">View Details</a>
+<!-- Inline composer -->
+<section class="form-card" x-data="{ count: 0, max: 280 }">
+  <h2 class="form-card-title">new twit</h2>
+  <form
+    hx-post="{% url 'twit_create' %}"
+    hx-target="#feed"
+    hx-swap="afterbegin"
+    data-reset-on-success
+  >
+    {% csrf_token %}
+    <div class="form-group">
+      <textarea
+        name="body"
+        placeholder="what's on your mind? markdown + ``` code fences ``` supported"
+        rows="3"
+        required
+        maxlength="2000"
+        @input="count = $event.target.value.length"
+      ></textarea>
+      <div
+        class="char-counter"
+        :class="{ 'is-warning': count > max * 0.85, 'is-danger': count > max }"
+      >
+        <span x-text="count"></span> chars
       </div>
     </div>
+    <div class="form-group">
+      <input type="url" name="image_url" placeholder="optional image url">
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">commit ↵</button>
+    </div>
+  </form>
+</section>
+
+<div id="feed" class="feed-list">
+  {% for twit in twit_list %}
+    {% include "partials/_twit_card.html" with twit=twit %}
+  {% empty %}
+    <div class="empty-state">
+      <p><span class="empty-state-prompt">$</span> ls ~/feed</p>
+      <p>// no twits yet. be the first to post.</p>
+    </div>
   {% endfor %}
+</div>
 {% endblock content %}

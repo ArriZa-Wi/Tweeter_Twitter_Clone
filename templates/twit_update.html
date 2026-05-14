@@ -1,23 +1,37 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
 
-
-{% block title %}Edit Twit{% endblock title %}
+{% block title %}edit twit{% endblock title %}
 
 {% block content %}
-  <div class="card shadow-sm mb-4">
-    <div class="card-header">
-      <h2>Edit Your Twit</h2>
+<header class="page-header">
+  <span class="prompt-symbol">$</span> vim twit_{{ object.id }}.md
+</header>
+
+<section class="form-card" x-data="{ count: {{ object.body|length }}, max: 280 }">
+  <h2 class="form-card-title">edit twit #{{ object.id }}</h2>
+  <form method="POST" action="">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="id_body">body</label>
+      <textarea
+        id="id_body"
+        name="body"
+        rows="5"
+        required
+        @input="count = $event.target.value.length"
+      >{{ form.body.value|default:'' }}</textarea>
+      <div class="char-counter" :class="{ 'is-warning': count > max * 0.85, 'is-danger': count > max }">
+        <span x-text="count"></span> chars
+      </div>
     </div>
-    <div class="card-body">
-      <form action="" method="POST">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <div class="mt-3">
-          <button class="btn btn-info" type="submit">Update</button>
-          <a href="{% url 'twit_list' %}" class="btn btn-outline-secondary ml-2">Cancel</a>
-        </div>
-      </form>
+    <div class="form-group">
+      <label for="id_image_url">image url</label>
+      <input type="url" id="id_image_url" name="image_url" value="{{ form.image_url.value|default:'' }}">
     </div>
-  </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">save changes</button>
+      <a class="btn btn-ghost" href="{% url 'twit_list' %}">cancel</a>
+    </div>
+  </form>
+</section>
 {% endblock content %}
